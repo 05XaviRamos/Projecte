@@ -27,6 +27,40 @@ public class SQL {
         
 	}
 	
+	public static Boolean deleteSql(Integer drink_id) throws SQLException {
+		connect(connection);
+		Statement statement = connection.createStatement();
+        statement.setQueryTimeout(5);
+        return statement.execute("DELETE FROM drinks WHERE drink_id='" + drink_id + "'");
+        
+	}
+	
+	public static ResultSet selectSql() throws SQLException {
+		connect(connection);
+		Statement statement = connection.createStatement();
+        statement.setQueryTimeout(5);
+        return statement.executeQuery("SELECT * FROM drinks");
+        
+	}
+	
+	public static ResultSet getDrinkType() throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.setQueryTimeout(5);
+        return statement.executeQuery("SELECT type_id, name FROM drink_types");
+    }
+	
+	public static ResultSet getBrand() throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.setQueryTimeout(5);
+        return statement.executeQuery("SELECT brand_id, name FROM brands");
+    }
+	
+	public static ResultSet getDrink() throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.setQueryTimeout(5);
+        return statement.executeQuery("SELECT drink_id, name FROM drinks");
+    }
+	
 	public static void connect(Connection conection) {
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:alcoholic_drinks.db");
