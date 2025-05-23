@@ -1,6 +1,5 @@
 package view;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -17,11 +16,12 @@ import model.Item;
 import model.SQL;
 
 public class Gui extends Application {
-	static Connection connection;
 	ListView<String> drinkListView;
 	ComboBox<Item> typeComboBox;
 	ComboBox<Item> brandComboBox;
 	ComboBox<Item> drinkComboBox;
+	ComboBox<Item> deleteDrinkComboBox;
+	ComboBox<Item> selectDrinkComboBox;
 	ComboBox<String> columnComboBox;
 	Integer drinkType;
 	String drinkName;
@@ -108,6 +108,12 @@ public class Gui extends Application {
 		drinkComboBox = new ComboBox<>();
 		drinkComboBox.getItems().add(new Item(null,"Choose drink"));
 		drinkComboBox.getSelectionModel().selectFirst();
+		deleteDrinkComboBox = new ComboBox<>();
+		deleteDrinkComboBox.getItems().add(new Item(null,"Choose drink"));
+		deleteDrinkComboBox.getSelectionModel().selectFirst();
+		selectDrinkComboBox = new ComboBox<>();
+		selectDrinkComboBox.getItems().add(new Item(null,"Choose drink"));
+		selectDrinkComboBox.getSelectionModel().selectFirst();
 		columnComboBox = new ComboBox<>();
 		columnComboBox.getItems().add(new String("Choose a column"));
 		columnComboBox.getItems().add(new String("name"));
@@ -136,6 +142,8 @@ public class Gui extends Application {
         	ResultSet rs = SQL.getDrink();
             while (rs.next()) {
                 drinkComboBox.getItems().add(new Item(rs.getInt("drink_id"),rs.getString("name")));
+                deleteDrinkComboBox.getItems().add(new Item(rs.getInt("drink_id"),rs.getString("name")));
+                selectDrinkComboBox.getItems().add(new Item(rs.getInt("drink_id"),rs.getString("name")));
             }
         } catch (SQLException e) {
             System.out.println("No s'han pogut carregar els rols.");
@@ -158,11 +166,12 @@ public class Gui extends Application {
         update.add(updateLabel, 0, 1);
         update.add(updateBtn, 0, 2);
         update.add(updateBack, 1, 2);
-        delete.add(drinkComboBox, 0, 0);
+        delete.add(deleteDrinkComboBox, 0, 0);
         delete.add(deleteBtn, 0, 1);
         delete.add(deleteBack, 1, 1);
         select.add(drinkListView, 0, 0);
-        select.add(selectBack, 1, 0);
+        select.add(selectBack, 1, 1);
+        select.add(selectDrinkComboBox, 0, 1);
         createBtn.setOnAction(__ -> {
         	drinkName = tfCreate.getText();        	
         	try {
@@ -180,7 +189,7 @@ public class Gui extends Application {
         });
         deleteBtn.setOnAction(__ -> {    	
         	try {
-				SQL.deleteSql(drinkComboBox.getValue().getId());
+				SQL.deleteSql(deleteDrinkComboBox.getValue().getId());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -191,8 +200,33 @@ public class Gui extends Application {
         brandComboBox.setOnAction(__ -> {
         	brand = brandComboBox.getValue().getId();         	
         });
-        
+        drinkComboBox.setOnAction(__ -> {
+        	if (selectDrinkComboBox.getValue().getId() == null) {
+        		try {
+        			drinkListView.getItems().clear();
+                    ResultSet rs = SQL.selectSql();
+                    while (rs.next()) {
+                        String fullName = rs.getString("name");
+                        String info = " | "+rs.getDouble("alcohol_content")+" | "+rs.getString("description")+" | " + rs.getDouble("volume");
+                        drinkListView.getItems().add(fullName + info);
+                    }
+                } catch (SQLException e) {
+                }
+        	} else {
+        		try {
+        			drinkListView.getItems().clear();
+                    ResultSet rs = SQL.selectSql(selectDrinkComboBox.getValue().getId());
+                    while (rs.next()) {
+                        String fullName = rs.getString("name");
+                        String info = " | "+rs.getDouble("alcohol_content")+" | "+rs.getString("description")+" | " + rs.getDouble("volume");
+                        drinkListView.getItems().add(fullName + info);
+                    }
+                } catch (SQLException e) {
+                }
+        	}
+        });
         try {
+			drinkListView.getItems().clear();
             ResultSet rs = SQL.selectSql();
             while (rs.next()) {
                 String fullName = rs.getString("name");
@@ -201,6 +235,8 @@ public class Gui extends Application {
             }
         } catch (SQLException e) {
         }
+        
+        
 
 		primaryStage.setTitle("Main menu");
 		primaryStage.setScene(mainScene);

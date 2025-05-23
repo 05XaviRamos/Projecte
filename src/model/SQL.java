@@ -43,6 +43,14 @@ public class SQL {
         
 	}
 	
+	public static ResultSet selectSql(Integer drink_id) throws SQLException {
+		connect(connection);
+		Statement statement = connection.createStatement();
+        statement.setQueryTimeout(5);
+        return statement.executeQuery("SELECT * FROM drinks WHERE drink_id='" + drink_id + "'");
+        
+	}
+	
 	public static ResultSet getDrinkType() throws SQLException {
         Statement statement = connection.createStatement();
         statement.setQueryTimeout(5);
