@@ -8,67 +8,63 @@ import java.sql.Statement;
 
 public class SQL {
 	static Connection connection;
-	public static Boolean insertSql(Integer type_id, Integer brand_id, String name) throws SQLException {
+	public static Boolean insertSql(int type_id, int brand_id, String country_code, double alcohol_content, String description, double volume, double price, String name) throws SQLException {
 		connect(connection);
 		Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.execute("INSERT INTO drinks ('name', 'type_id', 'brand_id') VALUES ('" + name + "'," + type_id + "," + brand_id + ")");
+		statement.setQueryTimeout(5);
+		return statement.execute("INSERT INTO drinks ('name', 'type_id', 'brand_id', 'country_code', 'alcohol_content', 'description', 'volume', 'price') VALUES ('" + name + "'," + type_id + "," + brand_id + ", '" + country_code + "', " + alcohol_content + ", '" + description + "', " + volume + ", " + price + ")");
 	}
-	
-	public static Boolean updateSql(Integer drink_id, String newValue, String column) throws SQLException {
+
+	public static Boolean insertSql(String name, String table) throws SQLException {
 		connect(connection);
 		Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        if (column.equals("volume") || column.equals("alcohol_content") || column.equals("price")) {
-        	return statement.execute("UPDATE drinks SET '" + column + "'='" + Double.parseDouble(newValue)  + "' WHERE drink_id = " + drink_id);
-        } else {
-        	return statement.execute("UPDATE drinks SET '" + column + "'='" + newValue + "' WHERE drink_id = " + drink_id);
-        }
-        
+		statement.setQueryTimeout(5);
+		return statement.execute("INSERT INTO '" + table + "'('name') VALUES ('" + name + "')");
 	}
-	
-	public static Boolean deleteSql(Integer drink_id) throws SQLException {
+	public static Boolean insertSql(String name, String country_code, String table) throws SQLException {
 		connect(connection);
 		Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.execute("DELETE FROM drinks WHERE drink_id='" + drink_id + "'");
-        
+		statement.setQueryTimeout(5);
+		return statement.execute("INSERT INTO '" + table + "' ('name', 'country_code') VALUES ('" + name + "', '" + country_code + "')");
 	}
-	
-	public static ResultSet selectSql() throws SQLException {
+
+	public static Boolean updateSql(int id,  String table, String name) throws SQLException {
 		connect(connection);
 		Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.executeQuery("SELECT * FROM drinks");
-        
+		statement.setQueryTimeout(5);
+		return statement.execute("UPDATE '" + table + "' SET name = '" + name + "' WHERE drink_id = " + id);        
 	}
-	
-	public static ResultSet selectSql(Integer drink_id) throws SQLException {
+
+	public static Boolean updateSql(int id,  String table, String name, String country_code) throws SQLException {
 		connect(connection);
 		Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.executeQuery("SELECT * FROM drinks WHERE drink_id='" + drink_id + "'");
-        
+		statement.setQueryTimeout(5);
+		return statement.execute("UPDATE '" + table + "' SET name = '" + name + "', country_code = '" + country_code + "' WHERE drink_id = " + id);        
 	}
-	
-	public static ResultSet getDrinkType() throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.executeQuery("SELECT type_id, name FROM drink_types");
-    }
-	
-	public static ResultSet getBrand() throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.executeQuery("SELECT brand_id, name FROM brands");
-    }
-	
-	public static ResultSet getDrink() throws SQLException {
-        Statement statement = connection.createStatement();
-        statement.setQueryTimeout(5);
-        return statement.executeQuery("SELECT drink_id, name FROM drinks");
-    }
-	
+
+	public static Boolean updateSql(int type_id, int brand_id, String country_code, double alcohol_content, String description, double volume, double price, String name, int id) throws SQLException {
+		connect(connection);
+		Statement statement = connection.createStatement();
+		statement.setQueryTimeout(5);
+		return statement.execute("UPDATE drinks SET name = '" + name + "', type_id = " + type_id + ", brand_id = " + brand_id + ", country_code = '" + country_code + "', alcohol_content = " + alcohol_content + ", description = '" + description + "', volume = " + volume + ", price = " + price + " WHERE drink_id = " + id ); 
+	}
+
+	public static Boolean deleteSql(int id, String table) throws SQLException {
+		connect(connection);
+		Statement statement = connection.createStatement();
+		statement.setQueryTimeout(5);
+		return statement.execute("DELETE FROM '" + table + "' WHERE drink_id='" + id + "'");
+
+	}
+
+	public static ResultSet selectSql(String table) throws SQLException {
+		connect(connection);
+		Statement statement = connection.createStatement();
+		statement.setQueryTimeout(5);
+		return statement.executeQuery("SELECT * FROM '" + table + "'");
+
+	}
+
 	public static void connect(Connection conection) {
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:alcoholic_drinks.db");
